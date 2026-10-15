@@ -1,0 +1,353 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIAP UJI - Bab 3 Bahasa Indonesia Kelas VI</title>
+<style>
+:root{--b:#1746a2;--c:#20b9c8;--bg:#f1f5ff;--ink:#1b2850}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(130deg,#123580,#2675d3,#20b9c8);color:white;text-align:center;padding:24px 14px}
+.logo{width:70px;height:70px;object-fit:contain;background:white;border-radius:50%;padding:4px}
+h1{margin:8px 0;font-size:29px}
+header p{margin:6px}
+main{max-width:900px;margin:22px auto;padding:0 14px}
+.card{background:white;padding:22px;border-radius:17px;margin-bottom:17px;box-shadow:0 5px 20px #173d8015}
+h2{color:var(--b);margin-top:0}
+input,select,textarea{font:inherit;width:100%;padding:12px;border:1px solid #ccd7ef;border-radius:9px;margin:6px 0 14px}
+textarea{min-height:100px}
+button{font:inherit;font-weight:bold;border:0;border-radius:9px;padding:12px 16px;cursor:pointer}
+.primary{background:var(--b);color:white}
+.secondary{background:#e5edff;color:var(--b)}
+.pill{display:inline-block;background:#eaf2ff;border-radius:20px;padding:8px 11px;margin:3px;font-size:13px}
+.badge{background:#fff0be;border-radius:6px;padding:5px 8px;font-size:12px;font-weight:bold}
+.question{border:1px solid #e0e8fa;border-radius:12px;padding:16px;margin:14px 0}
+.question h3{font-size:16px;line-height:1.5}
+.option{display:flex;gap:9px;align-items:flex-start;background:#f6f8ff;padding:10px;border-radius:8px;margin:5px 0;cursor:pointer}
+.option input{width:auto;margin:3px 0 0}
+.progress{height:9px;background:#e5eafa;border-radius:10px;overflow:hidden;margin:12px 0}
+.progress div{height:100%;width:0;background:linear-gradient(90deg,var(--c),var(--b))}
+.notice{background:#fff7dc;border-left:4px solid #f1b92b;padding:12px;border-radius:8px;font-size:14px}
+.actions{display:flex;gap:9px;flex-wrap:wrap}
+.muted{font-size:13px;color:#687696}
+.hidden{display:none!important}
+footer{text-align:center;padding:20px;color:#7783a1;font-size:12px}
+@media(max-width:600px){h1{font-size:24px}.card{padding:15px}}
+@media print{header,#login,#instructions,.no-print,footer{display:none!important}body{background:white}.card{box-shadow:none}}
+</style>
+</head>
+<body>
+<header>
+<img class="logo" alt="Tut Wuri Handayani"
+src="https://upload.wikimedia.org/wikipedia/commons/4/48/Tut_Wuri_Handayani.png"
+onerror="this.style.display='none'">
+<h1>🎮 SIAP UJI</h1>
+<p><b>Sistem Interaktif Asesmen Pembelajaran untuk Uji Kompetensi</b></p>
+<p>SD Negeri Denanyar 1 · Tangen</p>
+<p>Bahasa Indonesia Kelas VI</p>
+<p><b>Bab 3: Taman Nasional dan Situs Warisan Dunia</b></p>
+</header>
+
+<main>
+<section id="login" class="card">
+<h2>🔐 Gerbang Petualangan</h2>
+<p>Masukkan nama dan NIPD untuk mengikuti ulangan.</p>
+<label for="student">Nama peserta didik</label>
+<select id="student"><option value="">-- Pilih nama --</option></select>
+<label for="password">Password (NIPD)</label>
+<input id="password" type="password" inputmode="numeric" placeholder="Masukkan NIPD">
+<button class="primary" onclick="login()">🚀 Masuk dan Mulai</button>
+<p id="error" style="color:#c62828"></p>
+<div class="notice">Kerjakan dengan jujur dan teliti. Bacalah setiap pertanyaan sampai selesai.</div>
+</section>
+
+<section id="instructions" class="card hidden">
+<h2>🏆 Misi Penjelajah Pengetahuan</h2>
+<p id="welcome"></p>
+<div>
+<span class="pill">15 Pilihan Ganda</span>
+<span class="pill">5 Pilihan Ganda Kompleks</span>
+<span class="pill">5 Menjodohkan</span>
+<span class="pill">10 Isian Singkat</span>
+<span class="pill">5 Uraian</span>
+</div>
+<p>Materi: legenda dan majas, catatan perjalanan, fakta dan opini, kalimat langsung dan tidak langsung, grafik, Museum Sangiran, kosakata arkeologi, dan laporan pengamatan.</p>
+<p><b>Skor objektif maksimal 80 poin.</b> Lima soal uraian dinilai guru dengan maksimal 20 poin.</p>
+<button class="primary" onclick="startQuiz()">Mulai Tantangan ✨</button>
+</section>
+
+<section id="quiz" class="hidden">
+<div class="card">
+<h2>📚 Tantangan Bab 3</h2>
+<span class="pill" id="studentLabel"></span>
+<span class="pill" id="progressLabel">0 dari 40 soal terisi</span>
+<div class="progress"><div id="bar"></div></div>
+<p class="muted">Soal kompleks dapat memiliki lebih dari satu jawaban benar.</p>
+</div>
+<div class="card" id="questions"></div>
+<div class="card no-print">
+<div class="actions">
+<button class="secondary" onclick="saveProgress()">💾 Simpan Kemajuan</button>
+<button class="primary" onclick="submitQuiz()">🏁 Kumpulkan Jawaban</button>
+</div>
+<p class="muted">Simpan kemajuan hanya tersimpan di browser pada perangkat yang digunakan.</p>
+</div>
+</section>
+
+<section id="result" class="card hidden">
+<h2>🎉 Rekap Hasil Ulangan</h2>
+<p id="studentInfo"></p>
+<div>
+<span class="pill" id="objective"></span>
+<span class="pill" id="percent"></span>
+<span class="pill" id="answered"></span>
+</div>
+<div class="notice">Skor objektif dihitung otomatis. Jawaban uraian perlu diperiksa guru sebelum nilai akhir ditetapkan.</div>
+<h3>Nilai uraian oleh guru</h3>
+<label for="essayScore">Masukkan nilai uraian (0–20)</label>
+<input id="essayScore" type="number" min="0" max="20" value="0">
+<button class="secondary no-print" onclick="calculateFinal()">Hitung Nilai Akhir</button>
+<p id="finalScore"></p>
+<h3>Rincian jawaban</h3>
+<div id="review"></div>
+<div class="actions no-print">
+<button class="primary" onclick="sendEmail()">📧 Siapkan Email Hasil</button>
+<button class="secondary" onclick="downloadCSV()">⬇️ Unduh CSV</button>
+<button class="secondary" onclick="window.print()">🖨️ Cetak</button>
+<button class="secondary" onclick="location.reload()">Kembali ke Awal</button>
+</div>
+<p class="muted">Email akan disiapkan untuk dikirim melalui aplikasi email di perangkat.</p>
+</section>
+</main>
+<footer>SIAP UJI · SD Negeri Denanyar 1 · Belajar dengan Gembira</footer>
+
+<script>
+const students=[
+["ABID ALVARO GAVRIEL","2759"],
+["AFFIN CHARLISA ACHYARNIS","2760"],
+["ALBY FAREL AXEL FAIRUS","2761"],
+["ANGGRAITA DARA KUSUMANINGRUM","2762"],
+["ARGA ADAM ALFATIR","2763"],
+["ARIF AZHARI SETIAWAN","2764"],
+["AZIZ SATRIO PRAMBUDI","2765"],
+["AZKA KHOIRUNNISA","2766"],
+["BILQIS ZAHIRA ALYA AZIZA","2820"],
+["DANIEL IRKHAM YUNIANTO","2767"],
+["DELTA DANIES WICAKSONO","2768"],
+["ELVINA NOVITA SARI","2769"],
+["FATIN DESTIANA SHIDQIA","2770"],
+["IAN THU ALFIAN","2771"],
+["KHALISA ZAHRA RAMADHANI","2772"],
+["LABIBAH ANINDYA JIHAN TALITA ULFA","2774"],
+["MAYDA NURUL AZKIA","2775"],
+["MUHAMMAD AMIRRUDIN","2776"],
+["MUHAMMAD EZA HAFIZ ADITIYA","2777"],
+["MUHAMMAD RIFKY CAHYO SAPUTRO","2778"],
+["NURIYA JANNATUN NAIM","2779"],
+["PRABU AHMAD AHNAFI","2780"],
+["QEYLA ABSHARI FIRDA RAHMADANI","2848"],
+["RAHMAT MAULANA","2781"],
+["RAVA'EL DWI VANDIMAS","2782"],
+["RAVE'AL DIMAS PRAYOGA","2783"],
+["RISMACERLYN NUR ISKANDAR","2784"],
+["SAMUEL DESWA ANGGARA","2785"],
+["VAHDIL ASKA HARIANSYAH","2824"]
+];
+
+const mc=[
+["Legenda merupakan cerita yang secara tradisional dikaitkan dengan ....",["Peristiwa atau asal-usul suatu tempat atau hal","Petunjuk penggunaan mesin","Daftar harga barang","Laporan keuangan"],0],
+["Dalam pembelajaran legenda Putri Komodo, informasi yang perlu diperhatikan adalah ....",["Tokoh, peristiwa, dan pesan cerita","Harga tiket pesawat","Jadwal pelajaran","Daftar belanja tokoh"],0],
+["Kalimat 'Angin berbisik di antara pepohonan' menggunakan majas ....",["Personifikasi","Hiperbola","Metafora","Litotes"],0],
+["Kalimat 'Suara air itu menggelegar membelah dunia' menggunakan majas ....",["Hiperbola","Personifikasi","Perumpamaan","Metonimia"],0],
+["Kalimat 'Ia adalah bintang kelas' menggunakan majas ....",["Metafora","Personifikasi","Hiperbola","Ironi"],0],
+["Catatan perjalanan biasanya memuat ....",["Tempat yang dikunjungi dan pengalaman selama perjalanan","Daftar nilai seluruh siswa","Petunjuk merakit komputer","Cerita tanpa lokasi"],0],
+["Pernyataan yang termasuk fakta adalah ....",["Museum Sangiran berada di wilayah Jawa Tengah","Sangiran adalah tempat paling indah di dunia","Semua pengunjung pasti sangat senang","Perjalanan ke museum selalu membosankan"],0],
+["Pernyataan yang termasuk opini adalah ....",["Menurut saya, museum itu sangat menarik","Museum memiliki ruang pamer","Fosil dipelajari oleh peneliti","Pengunjung membaca informasi pameran"],0],
+["Kalimat langsung ditandai dengan penggunaan ....",["Tanda petik untuk mengapit ucapan langsung","Tanda kurung siku di setiap kata","Tanda hubung pada semua kalimat","Huruf kapital pada setiap suku kata"],0],
+["Kalimat tidak langsung digunakan untuk ....",["Menyampaikan kembali perkataan seseorang","Menyalin dialog dengan tanda petik persis","Menuliskan daftar benda saja","Mengubah fakta menjadi opini"],0],
+["Rina berkata, 'Museum itu menarik.' Bentuk tidak langsung yang tepat adalah ....",["Rina berkata bahwa museum itu menarik","Rina berkata, 'bahwa museum itu menarik'","Museum berkata kepada Rina","Rina bertanya kapan museum dibuka"],0],
+["Grafik paling tepat digunakan untuk ....",["Menyajikan data agar mudah dibandingkan","Menggantikan semua sumber data","Membuat data menjadi rahasia","Menambahkan informasi yang tidak tersedia"],0],
+["Pada grafik jumlah pengunjung, batang tertinggi menunjukkan ....",["Jumlah pengunjung paling banyak","Jumlah pengunjung paling sedikit","Tidak ada pengunjung","Data tidak dapat dibaca"],0],
+["Arkeologi adalah ilmu yang mempelajari masa lalu manusia melalui ....",["Peninggalan dan bukti material","Ramalan cuaca","Gerak planet saja","Resep masakan modern"],0],
+["Laporan hasil pengamatan yang baik disusun secara ....",["Runtut, jelas, dan berdasarkan hasil pengamatan","Acak dan tanpa bukti","Penuh dugaan pribadi saja","Tanpa menyebutkan objek"],0]
+];
+
+const complex=[
+["Pilih semua ciri yang dapat ditemukan dalam legenda.",["Memiliki tokoh","Memiliki rangkaian peristiwa","Dapat memuat pesan moral","Selalu berupa laporan angka"],[0,1,2]],
+["Pilih pernyataan yang merupakan fakta.",["Museum Sangiran menyimpan koleksi fosil","Menurut saya, museum paling bagus","Fosil merupakan salah satu objek kajian arkeologi","Tempat itu pasti paling menakjubkan"],[0,2]],
+["Pilih hal yang sebaiknya dicatat dalam catatan perjalanan.",["Nama tempat yang dikunjungi","Kegiatan yang dilakukan","Pengalaman atau informasi penting","Kejadian yang tidak dialami dan dibuat-buat"],[0,1,2]],
+["Pilih informasi yang dapat membantu menafsirkan grafik pengunjung.",["Judul grafik","Label sumbu dan satuan","Nilai data","Warna hiasan tanpa keterangan data"],[0,1,2]],
+["Pilih unsur penting laporan hasil pengamatan.",["Objek yang diamati","Hasil pengamatan yang terperinci","Informasi yang disusun runtut","Kesimpulan yang tidak didukung pengamatan"],[0,1,2]]
+];
+
+const matching=[
+["Personifikasi","Majas yang menggambarkan benda seolah-olah bertindak seperti manusia"],
+["Fakta","Pernyataan yang dapat dibuktikan kebenarannya"],
+["Opini","Pendapat atau penilaian seseorang"],
+["Arkeologi","Ilmu yang mengkaji kehidupan masa lalu melalui peninggalan material"],
+["Laporan pengamatan","Tulisan sistematis berdasarkan objek yang diamati"]
+];
+
+const shortAnswers=[
+["Majas yang memberi sifat manusia kepada benda disebut ....",["personifikasi"]],
+["Majas yang melebih-lebihkan sesuatu disebut ....",["hiperbola"]],
+["Pernyataan yang dapat dibuktikan kebenarannya disebut ....",["fakta"]],
+["Pendapat pribadi terhadap suatu hal disebut ....",["opini"]],
+["Tanda baca yang mengapit ucapan langsung adalah tanda ....",["petik","tanda petik"]],
+["Perkataan seseorang yang disampaikan kembali tanpa mengutip ucapan persis disebut kalimat ....",["tidak langsung","kalimat tidak langsung"]],
+["Ilmu yang mengkaji peninggalan masa lalu manusia disebut ....",["arkeologi"]],
+["Benda sisa makhluk hidup masa lampau yang membatu atau terawetkan disebut ....",["fosil"]],
+["Tulisan sistematis berdasarkan pengamatan terhadap suatu objek disebut laporan hasil ....",["pengamatan","observasi"]],
+["Bagian laporan yang merangkum hasil utama pengamatan disebut ....",["kesimpulan"]]
+];
+
+const essays=[
+["Jelaskan isi atau pesan yang dapat dipetik dari sebuah legenda, misalnya Legenda Putri Komodo. Bedakan peristiwa dalam cerita dengan fakta yang dapat dibuktikan.",4],
+["Buatlah dua contoh kalimat yang menggunakan majas berbeda. Sebutkan jenis majas dan jelaskan maknanya.",4],
+["Tuliskan tiga contoh fakta dan dua contoh opini yang mungkin ditemukan dalam catatan perjalanan ke taman nasional atau museum.",4],
+["Ubahlah kalimat langsung berikut menjadi kalimat tidak langsung: Dita berkata, 'Saya melihat fosil di Museum Sangiran.' Jelaskan perubahan yang kamu lakukan.",4],
+["Tuliskan kerangka laporan pengamatan tentang museum atau situs bersejarah. Sertakan objek, tujuan, hasil pengamatan, dan kesimpulan.",4]
+];
+
+let current=null, submitted=false, resultData=null;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+students.forEach((s,i)=>{
+ let o=document.createElement("option");o.value=i;o.textContent=s[0];$("student").appendChild(o);
+});
+
+function login(){
+ const idx=$("student").value,pw=$("password").value.trim();
+ if(idx===""){ $("error").textContent="Pilih nama peserta didik terlebih dahulu.";return; }
+ if(pw!==students[Number(idx)][1]){$("error").textContent="NIPD tidak sesuai.";return;}
+ current=students[Number(idx)];
+ $("login").classList.add("hidden");$("instructions").classList.remove("hidden");
+ $("welcome").textContent="Selamat datang, "+current[0]+". Selesaikan setiap misi dengan teliti!";
+}
+function startQuiz(){
+ $("instructions").classList.add("hidden");$("quiz").classList.remove("hidden");
+ $("studentLabel").textContent=current[0];render();updateProgress();
+}
+function render(){
+ let h="<h2>📖 Misi 1 — Pilihan Ganda</h2><p class='muted'>Pilih satu jawaban yang tepat.</p>";
+ mc.forEach((q,i)=>{
+ h+=`<div class="question"><span class="badge">Soal ${i+1} · 2 poin</span><h3>${i+1}. ${esc(q[0])}</h3>`;
+ q[1].forEach((x,j)=>h+=`<label class="option"><input type="radio" name="m${i}" value="${j}" onchange="updateProgress()"><span>${"ABCD"[j]}. ${esc(x)}</span></label>`);
+ h+="</div>";
+ });
+ h+="<h2>🧠 Misi 2 — Pilihan Ganda Kompleks</h2><p class='muted'>Pilih semua jawaban yang benar.</p>";
+ complex.forEach((q,i)=>{
+ h+=`<div class="question"><span class="badge">Soal ${i+16} · 4 poin</span><h3>${i+16}. ${esc(q[0])}</h3>`;
+ q[1].forEach((x,j)=>h+=`<label class="option"><input type="checkbox" name="c${i}" value="${j}" onchange="updateProgress()"><span>${"ABCD"[j]}. ${esc(x)}</span></label>`);
+ h+="</div>";
+ });
+ h+="<h2>🔗 Misi 3 — Menjodohkan</h2>";
+ matching.forEach((q,i)=>{
+ h+=`<div class="question"><span class="badge">Soal ${i+21} · 2 poin</span><h3>${i+21}. ${esc(q[0])}</h3><select id="j${i}" onchange="updateProgress()"><option value="">-- Pilih arti yang sesuai --</option>`;
+ matching.forEach((d,j)=>h+=`<option value="${j}">${String.fromCharCode(65+j)}. ${esc(d[1])}</option>`);
+ h+="</select></div>";
+ });
+ h+="<h2>⚡ Misi 4 — Isian Singkat</h2>";
+ shortAnswers.forEach((q,i)=>h+=`<div class="question"><span class="badge">Soal ${i+26} · 2 poin</span><h3>${i+26}. ${esc(q[0])}</h3><input id="s${i}" placeholder="Ketik jawaban..." oninput="updateProgress()"></div>`);
+ h+="<h2>✍️ Misi 5 — Uraian</h2><p class='muted'>Jawablah dengan lengkap. Guru akan memeriksa jawaban bagian ini.</p>";
+ essays.forEach((q,i)=>h+=`<div class="question"><span class="badge">Soal ${i+36} · 4 poin</span><h3>${i+36}. ${esc(q[0])}</h3><textarea id="e${i}" placeholder="Tuliskan jawabanmu..." oninput="updateProgress()"></textarea></div>`);
+ $("questions").innerHTML=h;
+}
+function updateProgress(){
+ let n=0;
+ mc.forEach((q,i)=>{if(document.querySelector(`input[name="m${i}"]:checked`))n++;});
+ complex.forEach((q,i)=>{if(document.querySelectorAll(`input[name="c${i}"]:checked`).length)n++;});
+ matching.forEach((q,i)=>{if($("j"+i).value!=="")n++;});
+ shortAnswers.forEach((q,i)=>{if($("s"+i).value.trim())n++;});
+ essays.forEach((q,i)=>{if($("e"+i).value.trim())n++;});
+ $("progressLabel").textContent=n+" dari 40 soal terisi";
+ $("bar").style.width=(n/40*100)+"%";
+}
+function collect(){
+ return {
+ m:mc.map((q,i)=>{let x=document.querySelector(`input[name="m${i}"]:checked`);return x?Number(x.value):null;}),
+ c:complex.map((q,i)=>Array.from(document.querySelectorAll(`input[name="c${i}"]:checked`)).map(x=>Number(x.value))),
+ j:matching.map((q,i)=>$("j"+i).value),
+ s:shortAnswers.map((q,i)=>$("s"+i).value.trim()),
+ e:essays.map((q,i)=>$("e"+i).value.trim())
+ };
+}
+function saveProgress(){
+ try{localStorage.setItem("siapuji_bab3_"+current[1],JSON.stringify(collect()));alert("Kemajuan tersimpan pada browser ini.");}
+ catch(e){alert("Penyimpanan lokal tidak tersedia pada browser ini.");}
+}
+function submitQuiz(){
+ if(submitted)return;
+ if(!confirm("Kumpulkan jawaban sekarang? Periksa kembali jawabanmu."))return;
+ const a=collect();let score=0,detail=[];
+ mc.forEach((q,i)=>{
+ let ok=a.m[i]===q[2];if(ok)score+=2;
+ detail.push({n:i+1,type:"Pilihan ganda",q:q[0],a:a.m[i]===null?"Belum dijawab":q[1][a.m[i]],key:q[1][q[2]],p:ok?2:0,max:2});
+ });
+ complex.forEach((q,i)=>{
+ let got=[...a.c[i]].sort((x,y)=>x-y),key=[...q[2]].sort((x,y)=>x-y);
+ let ok=got.length===key.length&&got.every((x,j)=>x===key[j]);if(ok)score+=4;
+ detail.push({n:i+16,type:"Pilihan ganda kompleks",q:q[0],a:got.length?got.map(j=>q[1][j]).join("; "):"Belum dijawab",key:key.map(j=>q[1][j]).join("; "),p:ok?4:0,max:4});
+ });
+ matching.forEach((q,i)=>{
+ let ok=a.j[i]!==""&&Number(a.j[i])===i;if(ok)score+=2;
+ detail.push({n:i+21,type:"Menjodohkan",q:q[0],a:a.j[i]===""?"Belum dijawab":matching[Number(a.j[i])][1],key:q[1],p:ok?2:0,max:2});
+ });
+ shortAnswers.forEach((q,i)=>{
+ let ans=a.s[i].toLowerCase().trim();
+ let ok=q[1].some(k=>ans===k.toLowerCase());
+ if(ok)score+=2;
+ detail.push({n:i+26,type:"Isian singkat",q:q[0],a:a.s[i]||"Belum dijawab",key:q[1].join(" / "),p:ok?2:0,max:2});
+ });
+ essays.forEach((q,i)=>detail.push({n:i+36,type:"Uraian",q:q[0],a:a.e[i]||"Belum dijawab",key:"Dinilai oleh guru",p:"Menunggu",max:4}));
+ resultData={name:current[0],nipd:current[1],date:new Date().toLocaleString("id-ID"),score,detail};
+ submitted=true;
+ $("quiz").classList.add("hidden");$("result").classList.remove("hidden");
+ $("studentInfo").textContent="Nama: "+current[0]+" | NIPD: "+current[1]+" | Waktu: "+resultData.date;
+ $("objective").textContent="Skor objektif "+score+"/80";
+ $("percent").textContent="Persentase objektif "+Math.round(score/80*100)+"%";
+ $("answered").textContent="Terisi "+detail.filter(d=>d.a!=="Belum dijawab").length+"/40";
+ $("review").innerHTML=detail.map(d=>`<div class="question"><b>Soal ${d.n} — ${esc(d.type)}</b><p>${esc(d.q)}</p><p><b>Jawaban:</b> ${esc(d.a)}</p><p><b>Kunci/pedoman:</b> ${esc(d.key)}</p><p><b>Skor:</b> ${d.p}/${d.max}</p></div>`).join("");
+ try{localStorage.removeItem("siapuji_bab3_"+current[1]);}catch(e){}
+ window.scrollTo(0,0);
+}
+function calculateFinal(){
+ let n=Number($("essayScore").value);
+ if(!Number.isFinite(n)||n<0||n>20){alert("Nilai uraian harus antara 0 dan 20.");return;}
+ resultData.essayScore=n;resultData.finalScore=Math.round(resultData.score+n);
+ $("finalScore").textContent="Nilai akhir: "+resultData.finalScore+"/100";
+}
+function emailBody(){
+ let s="HASIL ULANGAN SIAP UJI\nSD Negeri Denanyar 1\nBahasa Indonesia Kelas VI - Bab 3: Taman Nasional dan Situs Warisan Dunia\n\n";
+ s+="Nama: "+resultData.name+"\nNIPD: "+resultData.nipd+"\nWaktu: "+resultData.date+"\nSkor objektif: "+resultData.score+"/80\n";
+ s+="Nilai uraian: "+(resultData.essayScore===undefined?"Belum dinilai":resultData.essayScore+"/20")+"\n";
+ s+="Nilai akhir: "+(resultData.finalScore===undefined?"Menunggu pemeriksaan uraian":resultData.finalScore+"/100")+"\n\n";
+ resultData.detail.forEach(d=>s+="Soal "+d.n+" ("+d.type+")\nPertanyaan: "+d.q+"\nJawaban: "+d.a+"\nKunci/pedoman: "+d.key+"\n\n");
+ return s;
+}
+function sendEmail(){
+ if(!resultData)return;
+ const subject=encodeURIComponent("Hasil SIAP UJI Bab 3 - "+resultData.name);
+ const body=encodeURIComponent(emailBody());
+ location.href="mailto:danysetyanto.ds@gmail.com?subject="+subject+"&body="+body;
+}
+function downloadCSV(){
+ if(!resultData)return;
+ const rows=[["Nama","NIPD","Waktu","Skor Objektif","Nilai Uraian","Nilai Akhir"],
+ [resultData.name,resultData.nipd,resultData.date,resultData.score+"/80",
+ resultData.essayScore===undefined?"Belum dinilai":resultData.essayScore+"/20",
+ resultData.finalScore===undefined?"Menunggu":resultData.finalScore+"/100"],[],
+ ["Nomor","Jenis","Pertanyaan","Jawaban","Kunci/Pedoman","Skor","Maksimal"]];
+ resultData.detail.forEach(d=>rows.push([d.n,d.type,d.q,d.a,d.key,d.p,d.max]));
+ const csv=rows.map(r=>r.map(v=>'"'+String(v??"").replace(/"/g,'""')+'"').join(",")).join("\r\n");
+ const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});
+ const url=URL.createObjectURL(blob),link=document.createElement("a");
+ link.href=url;link.download="SIAP_UJI_Bab3_"+resultData.nipd+".csv";link.click();
+ URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
